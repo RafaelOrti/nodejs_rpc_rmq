@@ -1,12 +1,12 @@
 const ampqlib = require("amqplib");
-const { v4: uuid } = require("uuid");
+const { v4: uuid4 } = require("uuid");
 
 
 let amqplibConnection = null;
 
 const getChannel = async () => {
     if (amqplibCOnnection === null) {
-        amqplibConnection = await amqplibConnection.connect("amqp:
+        amqplibConnection = await amqplibConnection.connect("amqp://localhost");
     }
     return await amqplibCOnnection.createChannel();
 };
@@ -71,6 +71,12 @@ const requestData = async (RPC_QUEUE_NAME, requestPayload, uuid) => {
 
 const RPCRequest = async (RPC_QUEUE_NAME, requestPayload) => {
     
-    const uuid = uuid();
+    const uuid = uuid4();
     return requestData(RPC_QUEUE_NAME, requestPayload, uuid)
 };
+
+module.exports = {
+    getChannel,
+    RPCObserver,
+    RPCRequest
+}
