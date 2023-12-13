@@ -1,14 +1,14 @@
-const ampqlib = require("amqplib");
+const amqplib = require("amqplib");
 const { v4: uuid4 } = require("uuid");
 
 
 let amqplibConnection = null;
 
 const getChannel = async () => {
-    if (amqplibCOnnection === null) {
-        amqplibConnection = await amqplibConnection.connect("amqp://localhost");
+    if (amqplibConnection === null) {
+        amqplibConnection = await amqplib.connect("amqp://localhost");
     }
-    return await amqplibCOnnection.createChannel();
+    return await amqplibConnection.createChannel();
 };
 
 
