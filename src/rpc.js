@@ -11,6 +11,17 @@ const getChannel = async () => {
     return await amqplibConnection.createChannel();
 };
 
+const expensiveDBOperation = (payload, fakeResponse) => {
+    console.log(payload);
+    console.log(fakeResponse);
+
+    return new Promise ((res, rej) => {
+        setTimeout(() => {
+            res(fakeResponse);
+        }, 3000)
+    })
+}
+
 
 const RPCObserver = async (RPC_QUEUE_NAME, fakeResponse) => {
     const channel = await getChannel();
@@ -28,7 +39,7 @@ const RPCObserver = async (RPC_QUEUE_NAME, fakeResponse) => {
             if (msg.content) {
                 // DB operation
                     const payload = JSON.parse(msg.content.toString());
-                    const response = { fakeResponse, payload }; //call fake DB response
+                    const response = await expensiveDBOperation(payload, fakeResponse); //call fake DB response
                 channel.sendToQueue(
                     msg.properties.replayTo,
                     Buffer.from(JSON.stringify(response)),
