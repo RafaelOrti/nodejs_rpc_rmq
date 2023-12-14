@@ -41,12 +41,13 @@ const RPCObserver = async (RPC_QUEUE_NAME, fakeResponse) => {
                     const payload = JSON.parse(msg.content.toString());
                     const response = await expensiveDBOperation(payload, fakeResponse); //call fake DB response
                 channel.sendToQueue(
-                    msg.properties.replayTo,
+                    msg.properties.replyTo,
                     Buffer.from(JSON.stringify(response)),
                     {
                         correlationId: msg.properties.correlationId,
                     }
                 );
+                channel.ack(msg);
             }
         }, {
             noAck: false,
@@ -61,7 +62,7 @@ const requestData = async (RPC_QUEUE_NAME, requestPayload, uuid) => {
     const q = await channel.assertQueue("", { exclusive: true });
 
     channel.sendToQueue( RPC_QUEUE_NAME, Buffer.from(JSON.stringify(requestPayload)), {
-            replayTo: q.queue,
+            replyTo: q.queue,
             correlationId: uuid,
     });
 
@@ -82,7 +83,7 @@ const requestData = async (RPC_QUEUE_NAME, requestPayload, uuid) => {
 const RPCRequest = async (RPC_QUEUE_NAME, requestPayload) => {
     
     const uuid = uuid4();
-    return requestData(RPC_QUEUE_NAME, requestPayload, uuid)
+    return await requestData(RPC_QUEUE_NAME, requestPayload, uuid)
 };
 
 module.exports = {
